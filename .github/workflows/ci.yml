@@ -222,3 +222,47 @@ jobs:
             build/reports/coverage/server-tests/coverage-summary.json
             build/reports/coverage/api-tests/coverage-summary.json
           retention-days: 7
+
+      - name: Generate HTML coverage report
+        run: |
+          npx nyc report --reporter=html --report-dir=build/reports/coverage/frontend-tests
+          npx nyc report --reporter=html --report-dir=build/reports/coverage/server-tests
+          npx nyc report --reporter=html --report-dir=build/reports/coverage/api-tests
+
+      - name: Install Puppeteer
+        run: npm install -g puppeteer
+
+      - name: Convert HTML coverage reports to PDF
+        run: |
+          node -e "const puppeteer = require('puppeteer'); (async () => { const browser = await puppeteer.launch(); const page = await browser.newPage(); await page.goto('file://' + process.cwd() + '/build/reports/coverage/frontend-tests/index.html', {waitUntil: 'networkidle0'}); await page.pdf({path: 'build/reports/coverage/frontend-tests/coverage.pdf', format: 'A4'}); await browser.close(); })()"
+          node -e "const puppeteer = require('puppeteer'); (async () => { const browser = await puppeteer.launch(); const page = await browser.newPage(); await page.goto('file://' + process.cwd() + '/build/reports/coverage/server-tests/index.html', {waitUntil: 'networkidle0'}); await page.pdf({path: 'build/reports/coverage/server-tests/coverage.pdf', format: 'A4'}); await browser.close(); })()"
+          node -e "const puppeteer = require('puppeteer'); (async () => { const browser = await puppeteer.launch(); const page = await browser.newPage(); await page.goto('file://' + process.cwd() + '/build/reports/coverage/api-tests/index.html', {waitUntil: 'networkidle0'}); await page.pdf({path: 'build/reports/coverage/api-tests/coverage.pdf', format: 'A4'}); await browser.close(); })()"
+
+      - name: Upload code coverage PDF reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-pdf
+          path: |
+            build/reports/coverage/frontend-tests/coverage.pdf
+            build/reports/coverage/server-tests/coverage.pdf
+            build/reports/coverage/api-tests/coverage.pdf
+          retention-days: 7
+
+      - name: Convert code scanning JSON to HTML
+        run: |
+          node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('code-scanning-issues.json'));let html='<html><body><h1>Code Scanning Issues</h1><pre>'+JSON.stringify(data,null,2)+'</pre></body></html>';fs.writeFileSync('code-scanning-issues.html',html);"
+          node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('security-hotspots.json'));let html='<html><body><h1>Security Hotspots</h1><pre>'+JSON.stringify(data,null,2)+'</pre></body></html>';fs.writeFileSync('security-hotspots.html',html);"
+
+      - name: Convert code scanning and security hotspots HTML to PDF
+        run: |
+          node -e "const puppeteer = require('puppeteer'); (async () => { const browser = await puppeteer.launch(); const page = await browser.newPage(); await page.goto('file://' + process.cwd() + '/code-scanning-issues.html', {waitUntil: 'networkidle0'}); await page.pdf({path: 'code-scanning-issues.pdf', format: 'A4'}); await browser.close(); })()"
+          node -e "const puppeteer = require('puppeteer'); (async () => { const browser = await puppeteer.launch(); const page = await browser.newPage(); await page.goto('file://' + process.cwd() + '/security-hotspots.html', {waitUntil: 'networkidle0'}); await page.pdf({path: 'security-hotspots.pdf', format: 'A4'}); await browser.close(); })()"
+
+      - name: Upload code scanning and security hotspots PDF reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-scanning-and-hotspots-pdf
+          path: |
+            code-scanning-issues.pdf
+            security-hotspots.pdf
+          retention-days: 7
