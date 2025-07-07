@@ -194,3 +194,31 @@ jobs:
         with:
           name: security-hotspots
           path: security-hotspots.json
+          retention-days: 7
+
+      - name: Export SonarQube Issues (Code Scanning) as JSON
+        run: |
+          curl -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/issues/search?componentKeys=santoshgarole5992_juice-shop&types=VULNERABILITY,BUG,CODE_SMELL" -o code-scanning-issues.json
+
+      - name: Upload Code Scanning Issues Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-scanning-issues
+          path: code-scanning-issues.json
+          retention-days: 7
+
+      - name: Generate JSON coverage summary
+        run: |
+          npx nyc report --reporter=json-summary --report-dir=build/reports/coverage/frontend-tests || true
+          npx nyc report --reporter=json-summary --report-dir=build/reports/coverage/server-tests || true
+          npx nyc report --reporter=json-summary --report-dir=build/reports/coverage/api-tests || true
+
+      - name: Upload code coverage summary (JSON)
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-json
+          path: |
+            build/reports/coverage/frontend-tests/coverage-summary.json
+            build/reports/coverage/server-tests/coverage-summary.json
+            build/reports/coverage/api-tests/coverage-summary.json
+          retention-days: 7
