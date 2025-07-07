@@ -230,7 +230,7 @@ jobs:
           npx nyc report --reporter=html --report-dir=build/reports/coverage/api-tests
 
       - name: Install Puppeteer
-        run: npm install -g puppeteer
+        run: npm install puppeteer
 
       - name: Convert HTML coverage reports to PDF
         run: |
