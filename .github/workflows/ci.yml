@@ -44,14 +44,11 @@ jobs:
           npm test
           npm run frisby
       
-      - name: Upload coverage reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-reports
-          path: |
-            build/reports/coverage/frontend-tests/lcov.info
-            build/reports/coverage/server-tests/lcov.info
-            build/reports/coverage/api-tests/lcov.info
+      - name: Debug - List coverage files
+        run: |
+          echo "Checking if coverage reports exist:"
+          ls -la build/reports/coverage/ || echo "No coverage directory found"
+          find . -name "*.info" -type f || echo "No .info files found"
       
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
@@ -76,7 +73,7 @@ jobs:
           name: sonarqube-scannerwork
           path: sonarqube-scannerwork.tar.gz
           retention-days: 7
-
+          
       - name: Export SonarQube Security Hotspots as JSON
         run: |
           curl -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/hotspots/search?projectKey=santoshgarole5992_juice-shop" -o security-hotspots.json
