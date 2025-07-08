@@ -292,7 +292,7 @@ jobs:
 
   docker:
     if: github.repository == 'juice-shop/juice-shop' && github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master')
-    needs: [test, api-test, e2e, custom-config-test, docker-test]
+    needs: [test, api-test, docker-test]
     runs-on: ubuntu-latest
     steps:
       - name: "Check out Git repository"
@@ -331,7 +331,7 @@ jobs:
 
   heroku:
     if: github.repository == 'juice-shop/juice-shop' && github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master')
-    needs: [test, api-test, e2e, custom-config-test]
+    needs: [test, api-test]
     runs-on: ubuntu-latest
     steps:
       - name: "Check out Git repository"
