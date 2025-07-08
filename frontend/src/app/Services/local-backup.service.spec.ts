@@ -12,6 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import * as FileSaver from 'file-saver'
 import { ChallengeService } from './challenge.service'
+import { SnackBarHelperService } from '../snack-bar-helper.service'
 
 describe('LocalBackupService', () => {
   let snackBar: any
@@ -67,10 +68,13 @@ describe('LocalBackupService', () => {
   })))
 
   it('should not restore language from an outdated backup version', waitForAsync(inject([LocalBackupService], (service: LocalBackupService) => {
+    const snackBarHelperService = TestBed.inject(SnackBarHelperService)
+    spyOn(snackBarHelperService, 'open')
     cookieService.put('language', 'de')
     service.restore(new File(['{ "version": 0, "language": "cn" }'], 'test.json')).subscribe(() => {
       expect(cookieService.get('language')).toBe('de')
-      expect(snackBar.open).toHaveBeenCalled()
+      expect(snackBarHelperService.open).toHaveBeenCalled()
+      expect(snackBar.open).not.toHaveBeenCalled()
     })
   })))
 })
