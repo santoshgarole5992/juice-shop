@@ -77,26 +77,26 @@ jobs:
           path: sonarqube-scannerwork.tar.gz
           retention-days: 7
 
-      - name: Export SonarQube Security Hotspots as PDF
+      - name: Export SonarQube Security Hotspots as JSON
         run: |
-          curl -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/hotspots/search?projectKey=santoshgarole5992_juice-shop" -o security-hotspots.pdf
+          curl -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/hotspots/search?projectKey=santoshgarole5992_juice-shop" -o security-hotspots.json
 
-      - name: Upload Security Hotspots Report as PDF
+      - name: Upload Security Hotspots Report as JSON
         uses: actions/upload-artifact@v4
         with:
           name: security-hotspots
-          path: security-hotspots.pdf
+          path: security-hotspots.json
           retention-days: 7
 
-      - name: Export SonarQube Issues (Code Scanning) as PDF
+      - name: Export SonarQube Issues (Code Scanning) as JSON
         run: |
-          curl -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/issues/search?componentKeys=santoshgarole5992_juice-shop&types=VULNERABILITY,BUG,CODE_SMELL" -o code-scanning-issues.pdf
+          curl -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/issues/search?componentKeys=santoshgarole5992_juice-shop&types=VULNERABILITY,BUG,CODE_SMELL" -o code-scanning-issues.json
 
-      - name: Upload Code Scanning Issues Report as PDF
+      - name: Upload Code Scanning Issues Report as JSON
         uses: actions/upload-artifact@v4
         with:
           name: code-scanning-issues
-          path: code-scanning-issues.pdf
+          path: code-scanning-issues.json
           retention-days: 7
 
       - name: Generate JSON coverage summary as JSON
